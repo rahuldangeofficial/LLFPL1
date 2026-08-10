@@ -1,0 +1,3 @@
+-- Identities are immutable, so a second binding is refused.
+Identity(Limit, 1)
+Identity(Limit, 2)

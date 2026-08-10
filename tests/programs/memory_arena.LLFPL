@@ -1,0 +1,14 @@
+-- Arenas are flat, aligned, byte-addressed storage that survives for the
+-- lifetime of the session.
+Slab(NetworkBuffer, 64)
+Identity(PayloadOffset, 8)
+
+Map(StorePayload, value, write_offset(NetworkBuffer, PayloadOffset, value))
+Map(LoadPayload, ignored, read_offset(NetworkBuffer, PayloadOffset))
+
+Commit(StorePayload(404.5))
+Commit(LoadPayload(0))
+Commit(write_offset(NetworkBuffer, 0, 1.25))
+Commit(read_offset(NetworkBuffer, 0))
+Commit(read_offset(NetworkBuffer, 56))
+Commit(plus(read_offset(NetworkBuffer, 0), read_offset(NetworkBuffer, PayloadOffset)))

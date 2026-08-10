@@ -1,0 +1,62 @@
+-- =============================================================================
+-- Newton's method for a square root
+--
+-- A genuine numerical method, written the way LLFPL wants it written: the
+-- iterate lives in an arena, Loop drives the recurrence, and the whole run
+-- allocates nothing.
+--
+--     x       = (x  + S / x ) / 2
+--      n + 1     n        n
+--
+-- The iteration doubles its correct digits each step, so twenty steps are far
+-- more than a binary64 result can use. Convergence is verified by squaring the
+-- answer and reporting the residual.
+--
+--     bin/llfpl examples/newton_square_root.LLFPL
+--
+-- Author: Rahul Dange
+-- Year:   2026
+-- =============================================================================
+
+Require(stdlib.LLFPL)
+
+Slab(IterationState, 64)
+
+Identity(TargetValue, 2)
+Identity(StepCount, 20)
+Identity(EstimateOffset, 0)
+
+Map(SeedEstimate, initial_estimate,
+    write_offset(IterationState, EstimateOffset, initial_estimate)
+)
+
+Map(CurrentEstimate, ignored, read_offset(IterationState, EstimateOffset))
+
+Map(RefineEstimate, iteration,
+    write_offset(IterationState, EstimateOffset,
+        divide(
+            plus(CurrentEstimate(0), divide(TargetValue, CurrentEstimate(0))),
+            TWO
+        )
+    )
+)
+
+-- The seed only has to be positive; the method finds the rest.
+Commit(SeedEstimate(ONE))
+Commit(Loop(StepCount, RefineEstimate))
+
+-- The converged estimate, and the exact residual of squaring it back.
+Commit(CurrentEstimate(0))
+Commit(minus(Square(CurrentEstimate(0)), TargetValue))
+
+-- Compared against the constant the standard library carries.
+--
+-- The difference is exactly one unit in the last place, and that is the right
+-- answer rather than a defect. The iteration has a fixed point in binary64 that
+-- sits one representable value below the correctly rounded root: at that point
+-- the update maps the value to itself, so no further step can improve it. Any
+-- implementation of this recurrence in this precision lands in the same place,
+-- which is why a numerical result is compared with a tolerance and never with
+-- exact equality.
+Commit(minus(CurrentEstimate(0), SQRT_TWO))
+Commit(NearlyEqual(CurrentEstimate(0), SQRT_TWO, multiply(EPSILON, 4)))

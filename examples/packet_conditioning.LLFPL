@@ -1,0 +1,88 @@
+-- =============================================================================
+-- Packet payload conditioning
+--
+-- A realistic use of LLFPL: samples arrive, are stored into a ring buffer at a
+-- fixed stride, and are conditioned on the way out. Every stage is branchless,
+-- and the whole pipeline allocates nothing after the two Slab declarations.
+--
+--     bin/llfpl examples/packet_conditioning.LLFPL
+--
+-- Author: Rahul Dange
+-- Year:   2026
+-- =============================================================================
+
+Require(stdlib.LLFPL)
+
+-- -----------------------------------------------------------------------------
+-- Buffer geometry
+--
+-- Sized in terms of its own parameters rather than as a magic number, so a
+-- change to the slot count cannot leave the reservation inconsistent with the
+-- code that indexes it.
+-- -----------------------------------------------------------------------------
+
+Identity(SampleWidthInBytes, 8)
+Identity(RingSlotCount, 64)
+Identity(RingCapacityInBytes, multiply(RingSlotCount, SampleWidthInBytes))
+
+Slab(PacketRing, 512)
+
+-- -----------------------------------------------------------------------------
+-- Conditioning parameters
+-- -----------------------------------------------------------------------------
+
+Identity(NoiseFloor, 0.5)
+Identity(SaturationLevel, 100)
+Identity(CalibrationGain, 1.25)
+Identity(CalibrationBias, -2)
+
+-- -----------------------------------------------------------------------------
+-- Pipeline stages
+-- -----------------------------------------------------------------------------
+
+-- Slot index to byte offset. Kept as a template so the stride appears once.
+Map(SlotOffset, slot_index, multiply(slot_index, SampleWidthInBytes))
+
+Map(IngestSample, slot_index, raw_value,
+    write_offset(PacketRing, SlotOffset(slot_index), raw_value)
+)
+
+Map(FetchSample, slot_index, read_offset(PacketRing, SlotOffset(slot_index)))
+
+-- Applies the sensor calibration: a gain and an offset.
+Map(Calibrate, value, plus(multiply(value, CalibrationGain), CalibrationBias))
+
+-- Suppresses anything the sensor cannot distinguish from noise.
+Map(SuppressNoise, value,
+    Branch(less(AbsoluteValue(value), NoiseFloor), 0, value)
+)
+
+-- Limits the magnitude without discarding the sign.
+Map(Saturate, value,
+    ClampToRange(value, Negate(SaturationLevel), SaturationLevel)
+)
+
+-- The full pipeline, as the composition of its stages.
+Map(ConditionSample, slot_index,
+    Saturate(SuppressNoise(Calibrate(FetchSample(slot_index))))
+)
+
+-- -----------------------------------------------------------------------------
+-- A run over five representative samples
+-- -----------------------------------------------------------------------------
+
+Commit(IngestSample(0, 40))       -- ordinary signal
+Commit(IngestSample(1, 1.7))      -- calibrates down into the noise floor
+Commit(IngestSample(2, 250))      -- above the saturation level
+Commit(IngestSample(3, -250))     -- saturates negative
+Commit(IngestSample(4, 1.6))      -- calibrates to exactly zero
+
+Commit(ConditionSample(0))
+Commit(ConditionSample(1))
+Commit(ConditionSample(2))
+Commit(ConditionSample(3))
+Commit(ConditionSample(4))
+
+-- The buffer still holds the raw samples: conditioning is a pure read.
+Commit(FetchSample(2))
+Commit(RingCapacityInBytes)

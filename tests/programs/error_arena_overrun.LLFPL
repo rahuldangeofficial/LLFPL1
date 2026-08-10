@@ -1,0 +1,3 @@
+-- An access past the end of an arena is refused rather than truncated.
+Slab(Buffer, 16)
+Commit(write_offset(Buffer, 100, 1))

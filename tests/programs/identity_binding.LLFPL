@@ -1,0 +1,8 @@
+-- Identities are immutable globals, and may be derived from earlier ones.
+Identity(BaseOffset, 100)
+Identity(Doubled, multiply(BaseOffset, 2))
+Identity(Ratio, divide(Doubled, BaseOffset))
+
+Commit(BaseOffset)
+Commit(Doubled)
+Commit(Ratio)

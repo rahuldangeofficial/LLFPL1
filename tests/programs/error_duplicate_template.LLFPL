@@ -1,0 +1,3 @@
+-- The same rule applies to templates.
+Map(Twice, value, multiply(value, 2))
+Map(Twice, value, plus(value, value))

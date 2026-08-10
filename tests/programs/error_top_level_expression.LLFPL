@@ -1,0 +1,2 @@
+-- Only declarations may appear at the top level.
+plus(1, 2)

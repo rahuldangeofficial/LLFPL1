@@ -1,0 +1,2 @@
+-- A declaration may not shadow a name the evaluator already resolves.
+Identity(plus, 1)

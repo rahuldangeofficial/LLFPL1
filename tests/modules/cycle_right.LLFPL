@@ -1,0 +1,2 @@
+Require(cycle_left.LLFPL)
+Identity(RightValue, 2)

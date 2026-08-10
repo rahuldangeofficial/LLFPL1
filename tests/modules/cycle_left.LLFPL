@@ -1,0 +1,4 @@
+-- Half of a deliberate Require cycle. Loading terminates because a module is
+-- recorded as loaded before its body runs.
+Require(cycle_right.LLFPL)
+Identity(LeftValue, 1)

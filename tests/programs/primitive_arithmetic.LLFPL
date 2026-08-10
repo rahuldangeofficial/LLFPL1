@@ -1,0 +1,13 @@
+-- Every primitive operation, with results that can be checked by hand.
+Commit(plus(2, 3))
+Commit(minus(2, 3))
+Commit(multiply(2.5, 4))
+Commit(divide(7, 2))
+Commit(modulo(7, 3))
+Commit(modulo(-7, 3))
+Commit(greater(3, 2))
+Commit(greater(2, 3))
+Commit(less(3, 2))
+Commit(less(2, 3))
+Commit(equal(2, 2))
+Commit(equal(2, 3))

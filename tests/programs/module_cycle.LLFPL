@@ -1,0 +1,5 @@
+-- A cycle of Require declarations terminates and binds everything once.
+Require(../modules/cycle_left.LLFPL)
+
+Commit(LeftValue)
+Commit(RightValue)

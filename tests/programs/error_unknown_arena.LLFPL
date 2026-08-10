@@ -1,0 +1,2 @@
+-- An arena must be reserved before it can be addressed.
+Commit(read_offset(NeverReserved, 0))

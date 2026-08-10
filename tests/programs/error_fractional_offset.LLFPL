@@ -1,0 +1,4 @@
+-- A byte offset must be a whole number; truncating one would silently address
+-- the wrong cell.
+Slab(Buffer, 64)
+Commit(read_offset(Buffer, 3.5))

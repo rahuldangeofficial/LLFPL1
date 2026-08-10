@@ -1,0 +1,123 @@
+-- =============================================================================
+-- LLFPL standard library
+--
+-- Loaded with Require(stdlib.LLFPL). The interpreter finds this file relative
+-- to its own location, so no path and no environment variable is needed.
+--
+-- Everything here is built from the eight primitives and the four built-in
+-- forms. Nothing in this file is privileged: a program could define all of it
+-- itself, and reading it is the shortest way to learn what the language can
+-- express.
+--
+-- Author: Rahul Dange
+-- Year:   2026
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- Mathematical constants
+-- -----------------------------------------------------------------------------
+
+Identity(ZERO, 0)
+Identity(ONE, 1)
+Identity(TWO, 2)
+Identity(TEN, 10)
+
+-- Correct to the last bit representable in binary64.
+Identity(PI, 3.141592653589793)
+Identity(TAU, 6.283185307179586)
+Identity(E, 2.718281828459045)
+Identity(SQRT_TWO, 1.4142135623730951)
+Identity(LN_TWO, 0.6931471805599453)
+
+-- Derived, to show that an identity may be computed from the ones before it.
+Identity(HALF_PI, divide(PI, TWO))
+Identity(DEGREES_PER_RADIAN, divide(180, PI))
+
+-- Limits of the binary64 format.
+Identity(EPSILON, 0.0000000000000002220446049250313)
+Identity(LARGEST_FINITE, 1.7976931348623157e308)
+Identity(SMALLEST_NORMAL, 2.2250738585072014e-308)
+
+-- -----------------------------------------------------------------------------
+-- Sign and magnitude
+-- -----------------------------------------------------------------------------
+
+Map(Negate, value, minus(ZERO, value))
+
+Map(AbsoluteValue, value,
+    Branch(less(value, ZERO), minus(ZERO, value), value)
+)
+
+-- Yields -1, 0 or 1. Built from two comparisons so that it stays branchless.
+Map(SignOf, value,
+    minus(greater(value, ZERO), less(value, ZERO))
+)
+
+-- -----------------------------------------------------------------------------
+-- Selection
+-- -----------------------------------------------------------------------------
+
+Map(Minimum, left, right, Branch(less(left, right), left, right))
+Map(Maximum, left, right, Branch(greater(left, right), left, right))
+
+Map(ClampToRange, value, lower_bound, upper_bound,
+    Maximum(lower_bound, Minimum(value, upper_bound))
+)
+
+-- -----------------------------------------------------------------------------
+-- Powers
+-- -----------------------------------------------------------------------------
+
+Map(Square, value, multiply(value, value))
+Map(Cube, value, multiply(value, multiply(value, value)))
+Map(Reciprocal, value, divide(ONE, value))
+
+-- -----------------------------------------------------------------------------
+-- Interpolation and scaling
+-- -----------------------------------------------------------------------------
+
+-- Linear interpolation. Written so that a fraction of exactly 1 returns the
+-- endpoint exactly, which the more obvious start + fraction * (end - start)
+-- does not guarantee in floating point.
+Map(Interpolate, start_value, end_value, fraction,
+    plus(multiply(start_value, minus(ONE, fraction)), multiply(end_value, fraction))
+)
+
+Map(ToRadians, degrees, divide(degrees, DEGREES_PER_RADIAN))
+Map(ToDegrees, radians, multiply(radians, DEGREES_PER_RADIAN))
+
+-- -----------------------------------------------------------------------------
+-- Comparison helpers
+-- -----------------------------------------------------------------------------
+
+Map(IsNegative, value, less(value, ZERO))
+Map(IsPositive, value, greater(value, ZERO))
+Map(IsZero, value, equal(value, ZERO))
+
+-- Tolerant equality, for values that arithmetic has already rounded.
+Map(NearlyEqual, left, right, tolerance,
+    less(AbsoluteValue(minus(left, right)), tolerance)
+)
+
+-- -----------------------------------------------------------------------------
+-- Rounding
+-- -----------------------------------------------------------------------------
+
+-- Truncation toward zero: subtracting the remainder of a division by one
+-- removes exactly the fractional part and keeps the sign of the input.
+Map(Truncate, value, minus(value, modulo(value, ONE)))
+
+Map(FractionalPart, value, modulo(value, ONE))
+
+-- -----------------------------------------------------------------------------
+-- Scratch arena
+--
+-- A general-purpose kilobyte of aligned storage for programs that need a place
+-- to keep state without reserving an arena of their own. A program with real
+-- storage requirements should declare its own Slab and leave this one alone.
+-- -----------------------------------------------------------------------------
+
+Slab(ScratchArena, 1024)
+
+Map(StoreScratch, byte_offset, value, write_offset(ScratchArena, byte_offset, value))
+Map(LoadScratch, byte_offset, read_offset(ScratchArena, byte_offset))

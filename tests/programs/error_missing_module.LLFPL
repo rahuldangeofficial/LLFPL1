@@ -1,0 +1,2 @@
+-- A required module that cannot be located is reported by name.
+Require(no_such_module.LLFPL)

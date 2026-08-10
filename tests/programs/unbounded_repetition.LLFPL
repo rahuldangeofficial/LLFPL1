@@ -1,0 +1,18 @@
+-- Loop supplies the unbounded iteration that makes the language Turing
+-- complete: state lives in an arena, selection comes from Branch.
+Slab(Counter, 64)
+Slab(IndexSum, 64)
+
+Map(StepCounter, iteration, write_offset(Counter, 0, plus(read_offset(Counter, 0), 1)))
+Map(AccumulateIndex, iteration,
+    write_offset(IndexSum, 0, plus(read_offset(IndexSum, 0), iteration))
+)
+
+Commit(Loop(1000000, StepCounter))
+Commit(read_offset(Counter, 0))
+
+Commit(Loop(100, AccumulateIndex))
+Commit(read_offset(IndexSum, 0))
+
+Commit(Loop(0, StepCounter))
+Commit(read_offset(Counter, 0))

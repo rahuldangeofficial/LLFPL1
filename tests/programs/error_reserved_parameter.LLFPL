@@ -1,0 +1,2 @@
+-- Parameters are held to the same rule as every other declared name.
+Map(Broken, Branch, plus(Branch, 1))

@@ -1,0 +1,11 @@
+-- Signs, fractions, exponents, and shortest round-trip printing.
+Commit(42)
+Commit(-42)
+Commit(3.5)
+Commit(-0.125)
+Commit(1.5e3)
+Commit(-2.5e-2)
+Commit(.75)
+Commit(divide(1, 3))
+Commit(0.1)
+Commit(plus(0.1, 0.2))

@@ -1,0 +1,3 @@
+-- And to arenas.
+Slab(Buffer, 64)
+Slab(Buffer, 128)

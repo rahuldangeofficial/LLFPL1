@@ -1,0 +1,2 @@
+-- A name that resolves to nothing is an error, not a zero.
+Commit(MissingName)

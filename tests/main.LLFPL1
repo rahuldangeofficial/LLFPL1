@@ -1,6 +1,0 @@
--- LLFPL1 Full Architecture Test
-Identity(Base_Offset, 100)
-
-Map(Calculate, x, plus(x, Base_Offset))
-
-Commit(Calculate(50.5))

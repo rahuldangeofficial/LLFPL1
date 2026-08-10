@@ -1,0 +1,16 @@
+-- Templates: zero through four parameters, nesting, and a body that is a bare
+-- parameter reference rather than a call.
+Identity(BaseOffset, 100)
+
+Map(Echo, value, value)
+Map(AddBase, value, plus(value, BaseOffset))
+Map(WeightedSum, left, right, left_weight, right_weight,
+    plus(multiply(left, left_weight), multiply(right, right_weight))
+)
+Map(Composed, value, AddBase(Echo(value)))
+
+Commit(Echo(7))
+Commit(AddBase(50.5))
+Commit(WeightedSum(2, 3, 10, 100))
+Commit(Composed(1))
+Commit(AddBase(AddBase(AddBase(0))))

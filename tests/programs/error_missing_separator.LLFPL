@@ -1,0 +1,2 @@
+-- A syntax error names what was expected and what was found.
+Commit(plus(1 2))

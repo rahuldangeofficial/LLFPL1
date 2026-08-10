@@ -1,0 +1,13 @@
+-- Branch selects arithmetically; the selector is always exactly 1.0 or 0.0.
+Identity(SignalThreshold, 100)
+
+Map(ClampSignal, value, Branch(greater(value, SignalThreshold), SignalThreshold, value))
+Map(AbsoluteValue, value, Branch(less(value, 0), minus(0, value), value))
+
+Commit(ClampSignal(150))
+Commit(ClampSignal(45))
+Commit(ClampSignal(100))
+Commit(AbsoluteValue(-12.5))
+Commit(AbsoluteValue(12.5))
+Commit(Branch(1, 10, 20))
+Commit(Branch(0, 10, 20))

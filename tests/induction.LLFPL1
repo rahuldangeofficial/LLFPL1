@@ -1,2 +1,0 @@
--- This should evaluate to: 50.5 + (10 * 100) = 1050.5
-plus(50.5, multiply(10, Base_Offset))

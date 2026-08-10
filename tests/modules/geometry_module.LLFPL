@@ -1,0 +1,3 @@
+-- A module required by tests/programs/module_require.LLFPL.
+Identity(ModuleOffset, 42)
+Map(AddModuleOffset, value, plus(value, ModuleOffset))

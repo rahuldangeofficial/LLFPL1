@@ -1,0 +1,10 @@
+-- Require resolves relative to the requiring module first, then along the
+-- search path, and loads each module exactly once however many times it is
+-- named.
+Require(../modules/geometry_module.LLFPL)
+Require(../modules/geometry_module.LLFPL)
+Require(stdlib.LLFPL)
+
+Commit(AddModuleOffset(58))
+Commit(ModuleOffset)
+Commit(Square(9))

@@ -1,0 +1,6 @@
+-- Division by zero yields a signed infinity, and a NaN compares unequal to
+-- itself. Both are IEEE 754 requirements, not implementation accidents.
+Commit(divide(1, 0))
+Commit(divide(-1, 0))
+Commit(equal(divide(0, 0), divide(0, 0)))
+Commit(multiply(1.7976931348623157e308, 10))
